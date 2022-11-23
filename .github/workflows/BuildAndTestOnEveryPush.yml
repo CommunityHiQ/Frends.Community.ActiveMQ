@@ -1,0 +1,30 @@
+name: BuildAndTestonEveryPushLinux.yml
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  build:
+    name: Build on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    
+    - name: set up docker
+      run: docker-compose -f ./Frends.Community.ActiveMQ.Tests/docker-compose.yml up -d
+
+    - name: Build
+      run: dotnet build
+    
+    - name: Test
+      run: dotnet test
+      
+    - name: Pack release version of task
+      run: dotnet pack --configuration Release --include-source
+      
+    - name: Push NuGet package to the testfeed
+      run: dotnet nuget push Frends.Community.ActiveMQ/bin/Release/Frends.Community.ActiveMQ.*.nupkg  --api-key ${{ secrets.COMMUNITY_FEED_API_KEY }} --source https://www.myget.org/F/frends-community-test/api/v2/package
+      
