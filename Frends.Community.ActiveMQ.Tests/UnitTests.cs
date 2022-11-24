@@ -11,7 +11,7 @@ namespace Frends.Community.ActiveMQ.Tests
     {
         /*
          * Tests require ActiveMQ to be in use. Please run the following command before executing tests.
-         * docker-compose up -d
+         * cd Frends.Community.ActiveMQ.Tests && docker-compose up -d
          * 
          * UI Admin login at http://localhost:8161/admin. User: admin, Pass: admin
          */

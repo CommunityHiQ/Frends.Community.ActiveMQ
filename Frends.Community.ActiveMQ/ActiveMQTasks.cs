@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Frends.Community.ActiveMQ
 {
     /// <summary>
-    /// Read email.
+    /// Class for ActiveMQ tasks.
     /// </summary>
     public class ActiveMQTasks
     {
@@ -38,8 +38,7 @@ namespace Frends.Community.ActiveMQ
                         var task = Task.Run(() => consumer.Receive());
                         if (task.Wait(TimeSpan.FromSeconds(5)))
                         {
-                            var message = task.Result;
-                            if (message is ITextMessage textMessage)
+                            if (task.Result is ITextMessage textMessage)
                             {
                                 if (textMessage.Text != null)
                                 {
