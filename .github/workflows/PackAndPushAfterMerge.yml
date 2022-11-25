@@ -23,7 +23,7 @@ jobs:
       run: dotnet pack --configuration Release --include-source 
       
     - name: Push NuGet package to the (prod) feed
-      run: dotnet nuget push Frends.Community.ActiveMQ\bin\Release\Frends.Community.ActiveMQ.*.nupkg --api-key ${{ secrets.COMMUNITY_FEED_API_KEY }}
+      run: dotnet nuget push Frends.Community.ActiveMQ\bin\Release\Frends.Community.ActiveMQ.*.nupkg --api-key ${{ secrets.COMMUNITY_FEED_API_KEY }} --source https://www.myget.org/F/frends-community/api/v2/package
     
     - name: Create Release
       id: create_release
