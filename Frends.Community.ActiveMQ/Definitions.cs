@@ -35,7 +35,7 @@ namespace Frends.Community.ActiveMQ
     }
 
     /// <summary>
-    /// Result-class for GetServiceAccountAccessToken-Task.
+    /// Result-class for Consume-Task.
     /// </summary>
     public class Result
     {
@@ -43,5 +43,40 @@ namespace Frends.Community.ActiveMQ
         /// Messages consumed from queue.
         /// </summary>
         public string[] Messages { get; set; }
+    }
+
+    /// <summary>
+    /// Input-class for Produce-Task.
+    /// </summary>
+    public class ProduceInput
+    {
+        /// <summary>
+        /// Connection string to ActveMQ.
+        /// </summary>
+        [PasswordPropertyText]
+        public string ConnectionString { get; set; }
+
+        /// <summary>
+        /// Queue to which message will be sent.
+        /// </summary>
+        [DisplayFormat(DataFormatString = "Text")]
+        public string Queue { get; set; }
+
+        /// <summary>
+        /// Message which will be sent to the queue.
+        /// </summary>
+        [DisplayFormat(DataFormatString = "Text")]
+        public string Message { get; set; }
+    }
+
+    /// <summary>
+    /// Result-class for Produce-Task.
+    /// </summary>
+    public class ProduceResult
+    {
+        /// <summary>
+        /// Message was sent successfully?
+        /// </summary>
+        public bool Success { get; set; }
     }
 }
