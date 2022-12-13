@@ -82,6 +82,7 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
 # Change Log
 
-| Version | Changes                                 |
-|---------|-----------------------------------------|
-| 1.0.0   | Initial implementation of Consume-Task. |
+| Version | Changes                                                |
+|---------|--------------------------------------------------------|
+| 1.0.0   | Initial implementation of Consume-Task.                |
+| 1.0.1   | Consume: Added Apache.NMS version 2.0.0 as dependency. |
