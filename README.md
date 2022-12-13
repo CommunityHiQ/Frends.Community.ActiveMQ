@@ -104,4 +104,5 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | Version | Changes                                                                     |
 |---------|-----------------------------------------------------------------------------|
 | 1.0.0   | Initial implementation of Consume-Task.                                     |
+| 1.0.1   | Consume: Added Apache.NMS version 2.0.0 as dependency.                      |
 | 2.0.0   | Initial implementation of Produce-Task, Documentation fix for Consume-Task. |
