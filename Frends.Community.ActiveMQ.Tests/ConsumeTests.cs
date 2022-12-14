@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Frends.Community.ActiveMQ.Tests
 {
     [TestFixture]
-    public class UnitTests
+    public class ConsumeTests
     {
         /*
          * Tests require ActiveMQ to be in use. Please run the following command before executing tests.

@@ -8,6 +8,7 @@ Frends Tasks for ActiveMQ.
 - [Installing](#installing)
 - [Tasks](#tasks)
   - [Consume](#consume)
+  - [Produce](#produce)
 - [Building](#building)
 - [License](#license)
 - [Contributing](#contributing)
@@ -42,11 +43,29 @@ https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view i
 | ---------|----------|-------------------------------|-------------------------------------|
 | Messages | string[] | Messages consumed from queue. | ["first message", "second message"] |
 
+## Produce
+
+### Task Parameters
+
+### Input
+
+| Property         | Type   | Description                                  | Example                                    |
+|------------------|--------|----------------------------------------------|--------------------------------------------|
+| ConnectionString | secret | Connection string to ActiveMQ.               | activemq:tcp://admin:admin@localhost:61616 |
+| Queue            | string | Queue name from which messages are consumed. | testqueue                                  |
+| Message          | string | Message which will be sent to queue.         | This is a test message.                    |
+
+### Result
+
+| Property | Type     | Description                    | Example |
+| ---------|----------|--------------------------------|---------|
+| Success  | boolean  | Message was sent successfully? | true    |
+
 # Building
 
 Clone a copy of the repo.
 
-`git clone https://github.com/CommunityHiQ/Frends.Community.GoogleApi.git`
+`git clone https://github.com/CommunityHiQ/Frends.Community.ActiveMQ.git`
 
 Build the project.
 
@@ -82,7 +101,8 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
 # Change Log
 
-| Version | Changes                                                |
-|---------|--------------------------------------------------------|
-| 1.0.0   | Initial implementation of Consume-Task.                |
-| 1.0.1   | Consume: Added Apache.NMS version 2.0.0 as dependency. |
+| Version | Changes                                                                     |
+|---------|-----------------------------------------------------------------------------|
+| 1.0.0   | Initial implementation of Consume-Task.                                     |
+| 1.0.1   | Consume: Added Apache.NMS version 2.0.0 as dependency.                      |
+| 2.0.0   | Initial implementation of Produce-Task, Documentation fix for Consume-Task. |
