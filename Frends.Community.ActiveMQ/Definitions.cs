@@ -42,7 +42,39 @@ namespace Frends.Community.ActiveMQ
         /// <summary>
         /// Messages consumed from queue.
         /// </summary>
-        public string[] Messages { get; set; }
+        public Message[] Messages { get; set; }
+    }
+
+    /// <summary>
+    /// Consume task's resulting message.
+    /// </summary>
+    public class Message
+    {
+        /// <summary>
+        /// Constructor for creating instances as intended.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="content"></param>
+        public Message(string type, dynamic content)
+        {
+            Type = type;
+            Content = content;
+        }
+
+        /// <summary>
+        /// Type of message. Can be "Text", "Bytes".
+        /// Other possibilities are "Map", "Object", "Stream", but those are
+        /// not supported yet.
+        /// </summary>
+        public string Type { get; }
+
+        /// <summary>
+        /// Content of the message with type depending on message type.
+        /// For Text messages the Content's type is string,
+        /// for Bytes messages the Content's type is byte[].
+        /// Other message types are not supported.
+        /// </summary>
+        public dynamic Content { get; }
     }
 
     /// <summary>

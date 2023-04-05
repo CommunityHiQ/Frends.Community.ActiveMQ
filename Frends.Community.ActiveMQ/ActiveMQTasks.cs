@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +22,7 @@ namespace Frends.Community.ActiveMQ
         /// <returns>Object{ string[] Messages }</returns>
         public static async Task<Result> Consume([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
         {
-            var messages = new List<string>();
+            var messages = new List<Message>();
             var factory = new NMSConnectionFactory(input.ConnectionString);
             using (var connection = await factory.CreateConnectionAsync())
             {
@@ -35,16 +36,36 @@ namespace Frends.Community.ActiveMQ
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         readNextMessage = false;
+                        
                         var task = Task.Run(() => consumer.Receive());
                         if (task.Wait(TimeSpan.FromSeconds(5)))
                         {
                             if (task.Result is ITextMessage textMessage)
                             {
-                                if (textMessage.Text != null)
-                                {
-                                    messages.Add(textMessage.Text);
-                                    readNextMessage = true;
-                                }
+                                messages.Add(new Message("Text", textMessage.Text));
+                                readNextMessage = true;
+                            }
+                            else if (task.Result is IStreamMessage streamMessage)
+                            {
+                                messages.Add(new Message("Stream", "Stream message are not supported"));
+                                readNextMessage = true;
+                            }
+                            else if (task.Result is IBytesMessage bytesMessage)
+                            {
+                                messages.Add(new Message("Bytes", bytesMessage.Content));
+                                readNextMessage = true;
+                            }
+                            else if (task.Result is IMapMessage mapMessage)
+                            {
+                                messages.Add(new Message("Map", "Map messages are not supported"));
+                                readNextMessage = true;
+                            }
+                            else if (task.Result is IObjectMessage objectMessage)
+                            {
+                                messages.Add(new Message("Object", "Object messages are not supported"));
+                                readNextMessage = true;
+                            } else {
+                                messages.Add(new Message("Unknown message type", "Unknown message type: " + task.Result.GetType().Name));
                             }
                         }
                     } while (readNextMessage);
