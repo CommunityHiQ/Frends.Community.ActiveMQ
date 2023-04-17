@@ -7,8 +7,9 @@ on:
 
 jobs:
   build:
-    name: Build on ubuntu-latest
-    runs-on: ubuntu-latest
+    # Current ubuntu-latest (22+) does not support .NET Framework 4.7.1, thus 20.4.
+    name: Build on ubuntu-20.04
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v1

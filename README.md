@@ -39,9 +39,9 @@ https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view i
 
 ### Result
 
-| Property | Type     | Description                   | Example                             |
-| ---------|----------|-------------------------------|-------------------------------------|
-| Messages | string[] | Messages consumed from queue. | ["first message", "second message"] |
+| Property | Type                                       | Description                                                                                                                                       | Example                                                                                        |
+| ---------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| Messages | Message[] { string Type, dynamic Content } | Messages consumed from queue. Content's type depends on message type, e.g. for text messages it is `string` and for byte messages it is `byte[]`. | [ { Type = "Text", Content = "my message" }, { Type = "Bytes", Content = [ 1, 2, 3, 4, 5 ] } ] |
 
 ## Produce
 
@@ -106,3 +106,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | 1.0.0   | Initial implementation of Consume-Task.                                     |
 | 1.0.1   | Consume: Added Apache.NMS version 2.0.0 as dependency.                      |
 | 2.0.0   | Initial implementation of Produce-Task, Documentation fix for Consume-Task. |
+| 3.0.0   | Consume: result's Messages property changed from array of strings to Message { string Type, dynamic Message }; added byte message support. |
