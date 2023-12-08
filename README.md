@@ -101,9 +101,10 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
 # Change Log
 
-| Version | Changes                                                                     |
-|---------|-----------------------------------------------------------------------------|
-| 1.0.0   | Initial implementation of Consume-Task.                                     |
-| 1.0.1   | Consume: Added Apache.NMS version 2.0.0 as dependency.                      |
-| 2.0.0   | Initial implementation of Produce-Task, Documentation fix for Consume-Task. |
+| Version | Changes                                                                                                                                    |
+|---------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| 1.0.0   | Initial implementation of Consume-Task.                                                                                                    |
+| 1.0.1   | Consume: Added Apache.NMS version 2.0.0 as dependency.                                                                                     |
+| 2.0.0   | Initial implementation of Produce-Task, Documentation fix for Consume-Task.                                                                |
 | 3.0.0   | Consume: result's Messages property changed from array of strings to Message { string Type, dynamic Message }; added byte message support. |
+| 3.1.0   | Consume: Added MaxMessagesToConsume parameter to Options                                                                                   |

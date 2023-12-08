@@ -66,6 +66,10 @@ namespace Frends.Community.ActiveMQ
                             } else {
                                 messages.Add(new Message("Unknown message type", "Unknown message type: " + task.Result.GetType().Name));
                             }
+                            
+                            if (options.MaxMessagesToConsume > 0 &&
+                                messages.Count >= options.MaxMessagesToConsume)
+                                break;
                         }
                     } while (readNextMessage);
                 }

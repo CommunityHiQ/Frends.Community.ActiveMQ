@@ -27,6 +27,13 @@ namespace Frends.Community.ActiveMQ
     public class Options
     {
         /// <summary>
+        /// Maximum number of messages to receive. 0 means no limit.
+        /// </summary>
+        [DefaultValue(0)]
+        public int MaxMessagesToConsume { get; set; }
+        
+        
+        /// <summary>
         /// Should the Task throw error if no messages are consumed?
         /// </summary>
         [DefaultValue(false)]
