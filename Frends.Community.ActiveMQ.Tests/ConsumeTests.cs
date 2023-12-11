@@ -95,6 +95,29 @@ namespace Frends.Community.ActiveMQ.Tests
             var error = Assert.ThrowsAsync<Exception>(async () => await ActiveMQTasks.Consume(input, options, new CancellationToken()));
             Assert.AreEqual("No messages consumed from queue emptyqueue.", error.Message);
         }
+        
+        [Test]
+        public async Task MaxMessagesToConsumeTest()
+        {
+            await SendMessageToQueue("test message 1");
+            await SendMessageToQueue("test message 2");
+            await SendMessageToQueue("test message 3");
+            
+            var input = new Input
+            {
+                ConnectionString = _connectionString,
+                Queue = "testqueue"
+            };
+            var options = new Options
+            {
+                MaxMessagesToConsume = 2
+            };
+            
+            var result = await ActiveMQTasks.Consume(input, options, new CancellationToken());
+            Assert.AreEqual(2, result.Messages.Length);
+            Assert.AreEqual("test message 1", result.Messages[0].Content);
+            Assert.AreEqual("test message 2", result.Messages[1].Content);
+        }
 
         #region HelperMethods
 
