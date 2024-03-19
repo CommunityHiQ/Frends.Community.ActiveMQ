@@ -36,8 +36,8 @@ namespace Frends.Community.ActiveMQ
                         cancellationToken.ThrowIfCancellationRequested();
                         readNextMessage = false;
                         
-                        var task = Task.Run(() => consumer.Receive());
-                        if (task.Wait(TimeSpan.FromSeconds(5)))
+                        var task = Task.Run(() => consumer.Receive(TimeSpan.FromSeconds(options.Timeout)), cancellationToken);
+                        if (task.Wait(5000, cancellationToken))
                         {
                             if (task.Result is ITextMessage textMessage)
                             {
@@ -63,7 +63,12 @@ namespace Frends.Community.ActiveMQ
                             {
                                 messages.Add(new Message("Object", "Object messages are not supported"));
                                 readNextMessage = true;
-                            } else {
+                            }
+                            else if (task.Result is null)
+                            {
+                                break;
+                            }
+                            else {
                                 messages.Add(new Message("Unknown message type", "Unknown message type: " + task.Result.GetType().Name));
                             }
                             
