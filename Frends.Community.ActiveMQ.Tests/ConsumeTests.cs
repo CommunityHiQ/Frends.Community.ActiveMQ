@@ -20,6 +20,24 @@ namespace Frends.Community.ActiveMQ.Tests
         // Another way to put it: tcp://172.28.100.124:62626?nms.username=ABCDE&nms.password=QWERTY
         private readonly string _connectionString = "activemq:tcp://admin:admin@localhost:61616";
 
+        [TearDown]
+        public async Task TearDown()
+        {
+            var input = new Input
+            {
+                ConnectionString = _connectionString,
+                Queue = "testqueue"
+            };
+
+            var options = new Options
+            {
+                Timeout = 1000,
+                MaxMessagesToConsume = 0,
+                ThrowErrorIfEmpty = false
+            };
+            await ActiveMQTasks.Consume(input, options, default);
+        }
+
         [Test]
         public async Task ConsumeBytesMessagesFromQueue()
         {
@@ -34,6 +52,7 @@ namespace Frends.Community.ActiveMQ.Tests
 
             var options = new Options
             {
+                Timeout = 5,
                 ThrowErrorIfEmpty = true
             };
             var result = await ActiveMQTasks.Consume(input, options, new CancellationToken());
@@ -46,7 +65,7 @@ namespace Frends.Community.ActiveMQ.Tests
         [Test]
         public async Task ConsumeMessagesFromQueue()
         {
-            await SendMessageToQueue("test message");
+            await SendMessageToQueue("test message", 1);
             var input = new Input
             {
                 ConnectionString = _connectionString,
@@ -55,11 +74,14 @@ namespace Frends.Community.ActiveMQ.Tests
 
             var options = new Options
             {
-                ThrowErrorIfEmpty = true
+                Timeout = 1,
+                MaxMessagesToConsume = 0,
+                ThrowErrorIfEmpty = false
             };
             var result = await ActiveMQTasks.Consume(input, options, new CancellationToken());
             Assert.IsTrue(result.Messages.Length > 0);
             Assert.AreEqual("test message", result.Messages[0].Content);
+            Assert.AreEqual(1, result.Messages.Length);
         }
 
         [Test]
@@ -73,6 +95,7 @@ namespace Frends.Community.ActiveMQ.Tests
 
             var options = new Options
             {
+                Timeout = 5,
                 ThrowErrorIfEmpty = false
             };
             Assert.DoesNotThrowAsync(async () => await ActiveMQTasks.Consume(input, options, new CancellationToken()));
@@ -89,6 +112,7 @@ namespace Frends.Community.ActiveMQ.Tests
 
             var options = new Options
             {
+                Timeout = 5,
                 ThrowErrorIfEmpty = true
             };
 
@@ -110,6 +134,7 @@ namespace Frends.Community.ActiveMQ.Tests
             };
             var options = new Options
             {
+                Timeout = 5,
                 MaxMessagesToConsume = 2
             };
             
@@ -141,7 +166,7 @@ namespace Frends.Community.ActiveMQ.Tests
             }
         }
 
-        private async Task SendMessageToQueue(string message)
+        private async Task SendMessageToQueue(string message, int count = 1)
         {
             var factory = new NMSConnectionFactory(_connectionString);
 
@@ -154,7 +179,10 @@ namespace Frends.Community.ActiveMQ.Tests
                 using (var producer = await session.CreateProducerAsync(dest))
                 {
                     producer.DeliveryMode = MsgDeliveryMode.NonPersistent;
-                    producer.Send(session.CreateTextMessage(message));
+                    for (int i = 0; i < count; i++)
+                    {
+                        producer.Send(session.CreateTextMessage(message));
+                    }
                 }
             }
         }
