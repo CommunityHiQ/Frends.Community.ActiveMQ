@@ -27,6 +27,12 @@ namespace Frends.Community.ActiveMQ
     public class Options
     {
         /// <summary>
+        /// Timeout for receiving messages. Timeout affects to single message.
+        /// </summary>
+        [DefaultValue(10)]
+        public int Timeout { get; set; }
+
+        /// <summary>
         /// Maximum number of messages to receive. 0 means no limit.
         /// </summary>
         [DefaultValue(0)]
