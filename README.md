@@ -111,4 +111,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | 3.0.0   | Consume: result's Messages property changed from array of strings to Message { string Type, dynamic Message }; added byte message support. |
 | 3.1.0   | Consume: Added MaxMessagesToConsume parameter to Options                                                                                   |
 | 3.2.0   | Consume: Added Timeout parameter for single message and added cancellation tokens to Task.Run and Task.Wait methods.                       |
-| 3.3.0   | Consume: Added Options.TaskExecutionTimeout parameter and renamed Options.Timeout to Options.MessageReceiveTimeout.                       |
+| 4.0.0   | Consume: Added Options.TaskExecutionTimeout parameter and renamed Options.Timeout to Options.MessageReceiveTimeout.                       |
