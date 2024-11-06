@@ -29,19 +29,21 @@ https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view i
 | Property         | Type   | Description                                  | Example                                    |
 |------------------|--------|----------------------------------------------|--------------------------------------------|
 | ConnectionString | secret | Connection string to ActiveMQ.               | activemq:tcp://admin:admin@localhost:61616 |
-| Queue            | string | Queue name from which messages are consumed. | testqueue                                  |
+| Queue            | string | Queue from which messages will be consumed   | testqueue									|
 
 ### Options
 
 | Property          | Type | Description                                       | Example |
 |-------------------|------|---------------------------------------------------|---------|
-| ThrowErrorIfEmpty | bool | Should the task fail if no messages are consumed? | true    |
+| MessageReceiveTimeout | int | Specifies the maximum duration, in seconds, to wait for receiving a message from the queue. | 10 |
+| MaxMessagesToConsume | int | Maximum number of messages to receive. A value of 0 means no limit. | 5 |
+| ThrowErrorIfEmpty | bool | Should the task throw an error if no messages are consumed? | true |
+| TaskExecutionTimeout | int | Specifies the maximum time, in milliseconds, to wait for the task to complete before considering it timed out. | 5000 |
 
 ### Result
 
-| Property | Type                                       | Description                                                                                                                                       | Example                                                                                        |
-| ---------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| Messages | Message[] { string Type, dynamic Content } | Messages consumed from queue. Content's type depends on message type, e.g. for text messages it is `string` and for byte messages it is `byte[]`. | [ { Type = "Text", Content = "my message" }, { Type = "Bytes", Content = [ 1, 2, 3, 4, 5 ] } ] |
+| Property | Type | Description | Example | | ---------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| Messages | Message[] { string Type, dynamic Content } | Messages consumed from the queue. Content's type depends on message type, e.g. for text messages it is `string` and for byte messages it is `byte[]`. | [ { Type = "Text", Content = "my message" }, { Type = "Bytes", Content = [ 1, 2, 3, 4, 5 ] } ] |
 
 ## Produce
 
@@ -49,17 +51,17 @@ https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view i
 
 ### Input
 
-| Property         | Type   | Description                                  | Example                                    |
+| Property         | Type   | Description | Example |
 |------------------|--------|----------------------------------------------|--------------------------------------------|
-| ConnectionString | secret | Connection string to ActiveMQ.               | activemq:tcp://admin:admin@localhost:61616 |
-| Queue            | string | Queue name from which messages are consumed. | testqueue                                  |
-| Message          | string | Message which will be sent to queue.         | This is a test message.                    |
+| ConnectionString | secret | Connection string to ActiveMQ. | activemq:tcp://admin:admin@localhost:61616 |
+| Queue            | string | Queue to which the message will be sent. | myQueue |
+| Message          | string | Message which will be sent to the queue. | This is a test message. |
 
 ### Result
 
 | Property | Type     | Description                    | Example |
 | ---------|----------|--------------------------------|---------|
-| Success  | boolean  | Message was sent successfully? | true    |
+| Success  | bool  | Indicates whether the message was sent successfully. | true |
 
 # Building
 
@@ -109,3 +111,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | 3.0.0   | Consume: result's Messages property changed from array of strings to Message { string Type, dynamic Message }; added byte message support. |
 | 3.1.0   | Consume: Added MaxMessagesToConsume parameter to Options                                                                                   |
 | 3.2.0   | Consume: Added Timeout parameter for single message and added cancellation tokens to Task.Run and Task.Wait methods.                       |
+| 3.3.0   | Consume: Added Options.TaskExecutionTimeout parameter and renamed Options.Timeout to Options.MessageReceiveTimeout.                       |

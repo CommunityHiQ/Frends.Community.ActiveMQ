@@ -35,9 +35,9 @@ namespace Frends.Community.ActiveMQ
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         readNextMessage = false;
-                        
-                        var task = Task.Run(() => consumer.Receive(TimeSpan.FromSeconds(options.Timeout)), cancellationToken);
-                        if (task.Wait(5000, cancellationToken))
+
+                        var task = Task.Run(() => consumer.Receive(TimeSpan.FromSeconds(options.MessageReceiveTimeout)), cancellationToken);
+                        if (task.Wait(options.TaskExecutionTimeout == 0 ? 5000 : options.TaskExecutionTimeout, cancellationToken))
                         {
                             if (task.Result is ITextMessage textMessage)
                             {
@@ -65,13 +65,10 @@ namespace Frends.Community.ActiveMQ
                                 readNextMessage = true;
                             }
                             else if (task.Result is null)
-                            {
                                 break;
-                            }
-                            else {
+                            else
                                 messages.Add(new Message("Unknown message type", "Unknown message type: " + task.Result.GetType().Name));
-                            }
-                            
+
                             if (options.MaxMessagesToConsume > 0 &&
                                 messages.Count >= options.MaxMessagesToConsume)
                                 break;

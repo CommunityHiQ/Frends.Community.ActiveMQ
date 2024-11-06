@@ -4,70 +4,81 @@ using System.ComponentModel.DataAnnotations;
 namespace Frends.Community.ActiveMQ
 {
     /// <summary>
-    /// Input-class for Consume-Task.
+    /// Input-class for the Consume-Task.
     /// </summary>
     public class Input
     {
         /// <summary>
-        /// Connection string to ActveMQ.
+        /// Connection string to ActiveMQ.
         /// </summary>
+        /// <example>tcp://localhost:61616</example>
         [PasswordPropertyText]
         public string ConnectionString { get; set; }
 
         /// <summary>
         /// Queue from which messages will be consumed.
         /// </summary>
+        /// <example>myQueue</example>
         [DisplayFormat(DataFormatString = "Text")]
         public string Queue { get; set; }
     }
 
     /// <summary>
-    /// Options-class for Consume-Task.
+    /// Options-class.
     /// </summary>
     public class Options
     {
         /// <summary>
-        /// Timeout for receiving messages. Timeout affects to single message.
+        /// Specifies the maximum duration, in seconds, to wait for receiving a message from the queue.
         /// </summary>
+        /// <example>10</example>
         [DefaultValue(10)]
-        public int Timeout { get; set; }
+        public int MessageReceiveTimeout { get; set; }
 
         /// <summary>
-        /// Maximum number of messages to receive. 0 means no limit.
+        /// Maximum amount of time, in milliseconds, to wait for the message consumption task to complete.
+        /// The default value is 5000 milliseconds (5 seconds).
         /// </summary>
+        /// <example>5000</example>
+        [DefaultValue(5000)]
+        public int TaskExecutionTimeout { get; set; }
+
+        /// <summary>
+        /// Maximum number of messages to receive. A value of 0 means no limit.
+        /// </summary>
+        /// <example>5</example>
         [DefaultValue(0)]
         public int MaxMessagesToConsume { get; set; }
-        
-        
+
         /// <summary>
-        /// Should the Task throw error if no messages are consumed?
+        /// Should the task throw an error if no messages are consumed?
         /// </summary>
+        /// <example>true</example>
         [DefaultValue(false)]
-        [DisplayName("Throw error if no messages are consumed")]
         public bool ThrowErrorIfEmpty { get; set; }
     }
 
     /// <summary>
-    /// Result-class for Consume-Task.
+    /// Result-class for the Consume-Task.
     /// </summary>
     public class Result
     {
         /// <summary>
-        /// Messages consumed from queue.
+        /// Messages consumed from the queue.
         /// </summary>
         public Message[] Messages { get; set; }
     }
 
     /// <summary>
-    /// Consume task's resulting message.
+    /// Consume-task's resulting message.
     /// </summary>
     public class Message
     {
         /// <summary>
         /// Constructor for creating instances as intended.
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="content"></param>
+        /// <param name="type">Type of the message.</param>
+        /// <param name="content">Content of the message.</param>
         public Message(string type, dynamic content)
         {
             Type = type;
@@ -76,52 +87,57 @@ namespace Frends.Community.ActiveMQ
 
         /// <summary>
         /// Type of message. Can be "Text", "Bytes".
-        /// Other possibilities are "Map", "Object", "Stream", but those are
-        /// not supported yet.
+        /// Other possibilities are "Map", "Object", "Stream", but those are not supported yet.
         /// </summary>
+        /// <example>Text</example>
         public string Type { get; }
 
         /// <summary>
         /// Content of the message with type depending on message type.
-        /// For Text messages the Content's type is string,
-        /// for Bytes messages the Content's type is byte[].
+        /// For text messages, the content's type is string.
+        /// For bytes messages, the content's type is byte[].
         /// Other message types are not supported.
         /// </summary>
+        /// <example>Hello, World!</example>
         public dynamic Content { get; }
     }
 
     /// <summary>
-    /// Input-class for Produce-Task.
+    /// Input-class for the Produce-Task.
     /// </summary>
     public class ProduceInput
     {
         /// <summary>
-        /// Connection string to ActveMQ.
+        /// Connection string to ActiveMQ.
         /// </summary>
+        /// <example>tcp://localhost:61616</example>
         [PasswordPropertyText]
         public string ConnectionString { get; set; }
 
         /// <summary>
-        /// Queue to which message will be sent.
+        /// Queue to which the message will be sent.
         /// </summary>
+        /// <example>myQueue</example>
         [DisplayFormat(DataFormatString = "Text")]
         public string Queue { get; set; }
 
         /// <summary>
         /// Message which will be sent to the queue.
         /// </summary>
+        /// <example>This is a test message.</example>
         [DisplayFormat(DataFormatString = "Text")]
         public string Message { get; set; }
     }
 
     /// <summary>
-    /// Result-class for Produce-Task.
+    /// Result-class for the Produce-Task.
     /// </summary>
     public class ProduceResult
     {
         /// <summary>
-        /// Message was sent successfully?
+        /// Indicates whether the message was sent successfully.
         /// </summary>
+        /// <example>true</example>
         public bool Success { get; set; }
     }
 }

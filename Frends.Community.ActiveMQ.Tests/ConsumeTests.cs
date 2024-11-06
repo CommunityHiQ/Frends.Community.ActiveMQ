@@ -31,7 +31,7 @@ namespace Frends.Community.ActiveMQ.Tests
 
             var options = new Options
             {
-                Timeout = 1000,
+                MessageReceiveTimeout = 1000,
                 MaxMessagesToConsume = 0,
                 ThrowErrorIfEmpty = false
             };
@@ -52,14 +52,14 @@ namespace Frends.Community.ActiveMQ.Tests
 
             var options = new Options
             {
-                Timeout = 5,
+                MessageReceiveTimeout = 5,
                 ThrowErrorIfEmpty = true
             };
             var result = await ActiveMQTasks.Consume(input, options, new CancellationToken());
             Assert.IsTrue(result.Messages.Length > 0);
             var bytesReceived = (byte[])result.Messages[0].Content;
             var strReceived = Encoding.UTF8.GetString(bytesReceived);
-            Assert.AreEqual(strReceived,  result.Messages[0].Content);
+            Assert.AreEqual(strReceived, result.Messages[0].Content);
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace Frends.Community.ActiveMQ.Tests
 
             var options = new Options
             {
-                Timeout = 1,
+                MessageReceiveTimeout = 1,
                 MaxMessagesToConsume = 0,
                 ThrowErrorIfEmpty = false
             };
@@ -95,7 +95,7 @@ namespace Frends.Community.ActiveMQ.Tests
 
             var options = new Options
             {
-                Timeout = 5,
+                MessageReceiveTimeout = 5,
                 ThrowErrorIfEmpty = false
             };
             Assert.DoesNotThrowAsync(async () => await ActiveMQTasks.Consume(input, options, new CancellationToken()));
@@ -112,21 +112,21 @@ namespace Frends.Community.ActiveMQ.Tests
 
             var options = new Options
             {
-                Timeout = 5,
+                MessageReceiveTimeout = 5,
                 ThrowErrorIfEmpty = true
             };
 
             var error = Assert.ThrowsAsync<Exception>(async () => await ActiveMQTasks.Consume(input, options, new CancellationToken()));
             Assert.AreEqual("No messages consumed from queue emptyqueue.", error.Message);
         }
-        
+
         [Test]
         public async Task MaxMessagesToConsumeTest()
         {
             await SendMessageToQueue("test message 1");
             await SendMessageToQueue("test message 2");
             await SendMessageToQueue("test message 3");
-            
+
             var input = new Input
             {
                 ConnectionString = _connectionString,
@@ -134,14 +134,86 @@ namespace Frends.Community.ActiveMQ.Tests
             };
             var options = new Options
             {
-                Timeout = 5,
+                MessageReceiveTimeout = 5,
                 MaxMessagesToConsume = 2
             };
-            
+
             var result = await ActiveMQTasks.Consume(input, options, new CancellationToken());
             Assert.AreEqual(2, result.Messages.Length);
             Assert.AreEqual("test message 1", result.Messages[0].Content);
             Assert.AreEqual("test message 2", result.Messages[1].Content);
+        }
+
+        [Test]
+        public async Task ConsumeBytesMessagesFromQueue_TaskExecutionTimeout_0()
+        {
+            var str = "test message";
+            var bytes = Encoding.UTF8.GetBytes(str);
+            await SendBytesMessageToQueue(bytes);
+            var input = new Input
+            {
+                ConnectionString = _connectionString,
+                Queue = "testqueue"
+            };
+
+            var options = new Options
+            {
+                MessageReceiveTimeout = 5,
+                ThrowErrorIfEmpty = true,
+                TaskExecutionTimeout = 0
+            };
+            var result = await ActiveMQTasks.Consume(input, options, new CancellationToken());
+            Assert.IsTrue(result.Messages.Length > 0);
+            var bytesReceived = (byte[])result.Messages[0].Content;
+            var strReceived = Encoding.UTF8.GetString(bytesReceived);
+            Assert.AreEqual(strReceived, result.Messages[0].Content);
+        }
+
+        [Test]
+        public async Task ConsumeBytesMessagesFromQueue_TaskExecutionTimeout_1()
+        {
+            var str = "test message";
+            var bytes = Encoding.UTF8.GetBytes(str);
+            await SendBytesMessageToQueue(bytes);
+            var input = new Input
+            {
+                ConnectionString = _connectionString,
+                Queue = "testqueue"
+            };
+
+            var options = new Options
+            {
+                MessageReceiveTimeout = 5,
+                ThrowErrorIfEmpty = true,
+                TaskExecutionTimeout = 1
+            };
+            var error = Assert.ThrowsAsync<Exception>(async () => await ActiveMQTasks.Consume(input, options, new CancellationToken()));
+            Assert.AreEqual("No messages consumed from queue testqueue.", error.Message);
+        }
+
+        [Test]
+        public async Task ConsumeBytesMessagesFromQueue_TaskExecutionTimeout_10000()
+        {
+            var str = "test message";
+            var bytes = Encoding.UTF8.GetBytes(str);
+            await SendBytesMessageToQueue(bytes);
+            var input = new Input
+            {
+                ConnectionString = _connectionString,
+                Queue = "testqueue"
+            };
+
+            var options = new Options
+            {
+                MessageReceiveTimeout = 5,
+                ThrowErrorIfEmpty = true,
+                TaskExecutionTimeout = 0
+            };
+            var result = await ActiveMQTasks.Consume(input, options, new CancellationToken());
+            Assert.IsTrue(result.Messages.Length > 0);
+            var bytesReceived = (byte[])result.Messages[0].Content;
+            var strReceived = Encoding.UTF8.GetString(bytesReceived);
+            Assert.AreEqual(strReceived, result.Messages[0].Content);
         }
 
         #region HelperMethods
