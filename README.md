@@ -112,3 +112,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | 3.1.0   | Consume: Added MaxMessagesToConsume parameter to Options                                                                                   |
 | 3.2.0   | Consume: Added Timeout parameter for single message and added cancellation tokens to Task.Run and Task.Wait methods.                       |
 | 4.0.0   | Consume: Added Options.TaskExecutionTimeout parameter and renamed Options.Timeout to Options.MessageReceiveTimeout.                       |
+| 5.0.0   | Updated frameworks to include .NET 6.0 and .NET 8.0.                        |
