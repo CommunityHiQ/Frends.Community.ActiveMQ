@@ -187,8 +187,11 @@ namespace Frends.Community.ActiveMQ.Tests
                 ThrowErrorIfEmpty = true,
                 TaskExecutionTimeout = 1
             };
-            var error = Assert.ThrowsAsync<Exception>(async () => await ActiveMQTasks.Consume(input, options, new CancellationToken()));
-            Assert.AreEqual("No messages consumed from queue testqueue.", error.Message);
+            var result = await ActiveMQTasks.Consume(input, options, new CancellationToken());
+            Assert.IsTrue(result.Messages.Length > 0);
+            var bytesReceived = (byte[])result.Messages[0].Content;
+            var strReceived = Encoding.UTF8.GetString(bytesReceived);
+            Assert.AreEqual(strReceived, result.Messages[0].Content);
         }
 
         [Test]
