@@ -56,6 +56,13 @@ namespace Frends.Community.ActiveMQ
         /// <example>true</example>
         [DefaultValue(false)]
         public bool ThrowErrorIfEmpty { get; set; }
+
+        /// <summary>
+        /// Determines how the task acknowledges consumed messages.
+        /// </summary>
+        /// <example>AcknowledgeBehavior.Immediate</example>
+        [DefaultValue(AcknowledgeBehavior.Immediate)]
+        public AcknowledgeBehavior Acknowledge { get; set; } = AcknowledgeBehavior.Immediate;
     }
 
     /// <summary>
@@ -140,4 +147,24 @@ namespace Frends.Community.ActiveMQ
         /// <example>true</example>
         public bool Success { get; set; }
     }
+
+    /// <summary>
+    /// Defines how and when consumed messages are acknowledged.
+    /// </summary>
+    public enum AcknowledgeBehavior
+    {
+        /// <summary>
+        /// Messages are acknowledged immediately after they are received.
+        /// </summary>
+        /// <example>AcknowledgeBehavior.Immediate</example>
+        Immediate,
+
+        /// <summary>
+        /// Messages are only acknowledged after the task finishes successfully.
+        /// If the task fails or is cancelled, messages remain unacknowledged and can be redelivered.
+        /// </summary>
+        /// <example>AcknowledgeBehavior.OnSuccess</example>
+        OnSuccess
+    }
+
 }

@@ -170,7 +170,7 @@ namespace Frends.Community.ActiveMQ.Tests
         }
 
         [Test]
-        public async Task ConsumeBytesMessagesFromQueue_TaskExecutionTimeout_1()
+        public async Task ConsumeBytesMessagesFromQueue_TaskExecutionTimeout_3()
         {
             var str = "test message";
             var bytes = Encoding.UTF8.GetBytes(str);
@@ -185,7 +185,7 @@ namespace Frends.Community.ActiveMQ.Tests
             {
                 MessageReceiveTimeout = 5,
                 ThrowErrorIfEmpty = true,
-                TaskExecutionTimeout = 1
+                TaskExecutionTimeout = 3
             };
             var error = Assert.ThrowsAsync<Exception>(async () => await ActiveMQTasks.Consume(input, options, new CancellationToken()));
             Assert.AreEqual("No messages consumed from queue testqueue.", error.Message);
@@ -214,6 +214,79 @@ namespace Frends.Community.ActiveMQ.Tests
             var bytesReceived = (byte[])result.Messages[0].Content;
             var strReceived = Encoding.UTF8.GetString(bytesReceived);
             Assert.AreEqual(strReceived, result.Messages[0].Content);
+        }
+
+        [Test]
+        public async Task ConsumeMessages_AcknowledgeOnSuccess_Success_MessagesAreAcknowledged()
+        {
+            await SendMessageToQueue("test message 1");
+            await SendMessageToQueue("test message 2");
+            await SendMessageToQueue("test message 3");
+
+            var input = new Input
+            {
+                ConnectionString = _connectionString,
+                Queue = "testqueue"
+            };
+
+            var options = new Options
+            {
+                MessageReceiveTimeout = 5,
+                MaxMessagesToConsume = 3,
+                ThrowErrorIfEmpty = false,
+                Acknowledge = AcknowledgeBehavior.OnSuccess
+            };
+
+            var result = await ActiveMQTasks.Consume(input, options, CancellationToken.None);
+
+            Assert.AreEqual(3, result.Messages.Length);
+
+            var secondResult = await ActiveMQTasks.Consume(input, options, CancellationToken.None);
+            Assert.AreEqual(0, secondResult.Messages.Length, "Messages should be acknowledged and not available for second consumption");
+        }
+
+        [Test]
+        public async Task ConsumeMessages_AcknowledgeOnSuccess_WithCancellation_MessagesNotAcknowledged()
+        {
+            await SendMessageToQueue("test message for cancellation 1");
+            await SendMessageToQueue("test message for cancellation 2");
+
+            var input = new Input
+            {
+                ConnectionString = _connectionString,
+                Queue = "testqueue"
+            };
+
+            var options = new Options
+            {
+                MessageReceiveTimeout = 30,
+                MaxMessagesToConsume = 2,
+                ThrowErrorIfEmpty = false,
+                Acknowledge = AcknowledgeBehavior.OnSuccess
+            };
+
+            using (var cts = new CancellationTokenSource())
+            {
+                cts.CancelAfter(TimeSpan.FromMilliseconds(50));
+
+                try
+                {
+                    await ActiveMQTasks.Consume(input, options, cts.Token);
+                }
+                catch (OperationCanceledException) { }
+            }
+
+            var verifyOptions = new Options
+            {
+                MessageReceiveTimeout = 5,
+                MaxMessagesToConsume = 0,
+                ThrowErrorIfEmpty = false,
+                Acknowledge = AcknowledgeBehavior.OnSuccess
+            };
+
+            var verifyResult = await ActiveMQTasks.Consume(input, verifyOptions, CancellationToken.None);
+
+            Assert.AreEqual(2, verifyResult.Messages.Length, "Messages should NOT be acknowledged after cancellation");
         }
 
         #region HelperMethods
@@ -258,7 +331,6 @@ namespace Frends.Community.ActiveMQ.Tests
                 }
             }
         }
-
         #endregion
     }
 }

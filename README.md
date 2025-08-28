@@ -39,6 +39,7 @@ https://www.myget.org/F/frends-community/api/v3/index.json and in Gallery view i
 | MaxMessagesToConsume | int | Maximum number of messages to receive. A value of 0 means no limit. | 5 |
 | ThrowErrorIfEmpty | bool | Should the task throw an error if no messages are consumed? | true |
 | TaskExecutionTimeout | int | Specifies the maximum time, in milliseconds, to wait for the task to complete before considering it timed out. | 5000 |
+| Acknowledge | AcknowledgeBehavior | Determines how the task acknowledges consumed messages. Options are Immediate (acknowledge as messages are consumed) or OnSuccess (acknowledge only after the task completes successfully). | Immediate |
 
 ### Result
 
@@ -111,4 +112,5 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | 3.0.0   | Consume: result's Messages property changed from array of strings to Message { string Type, dynamic Message }; added byte message support. |
 | 3.1.0   | Consume: Added MaxMessagesToConsume parameter to Options                                                                                   |
 | 3.2.0   | Consume: Added Timeout parameter for single message and added cancellation tokens to Task.Run and Task.Wait methods.                       |
-| 4.0.0   | Consume: Added Options.TaskExecutionTimeout parameter and renamed Options.Timeout to Options.MessageReceiveTimeout.                       |
+| 4.0.0   | Consume: Added Options.TaskExecutionTimeout parameter and renamed Options.Timeout to Options.MessageReceiveTimeout.
+| 4.1.0 | Consume: Added Options.Acknowledge parameter to control when messages are acknowledged. Default Immediate behaves like previous versions (messages are acknowledged as they are consumed), while OnSuccess acknowledges only after the task completes successfully. |
