@@ -22,7 +22,7 @@ namespace Frends.Community.ActiveMQ
         public static async Task<Result> Consume([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
         {
             var messages = new List<Message>();
-            var receivedRawMessages = new List<IMessage>();
+            IMessage lastRawMessage = null;
 
             var factory = new NMSConnectionFactory(input.ConnectionString);
             using (var connection = await factory.CreateConnectionAsync())
@@ -79,7 +79,7 @@ namespace Frends.Community.ActiveMQ
                             }
 
                             if (options.Acknowledge == AcknowledgeBehavior.OnSuccess)
-                                receivedRawMessages.Add(rawMsg);
+                                lastRawMessage = rawMsg;
 
                             if (options.MaxMessagesToConsume > 0 &&
                                 messages.Count >= options.MaxMessagesToConsume)
@@ -87,10 +87,9 @@ namespace Frends.Community.ActiveMQ
                         }
                     } while (readNextMessage);
 
-                    if (options.Acknowledge == AcknowledgeBehavior.OnSuccess && receivedRawMessages.Count > 0)
+                    if (options.Acknowledge == AcknowledgeBehavior.OnSuccess && lastRawMessage != null)
                     {
-                        foreach (var msg in receivedRawMessages)
-                            msg.Acknowledge();
+                        lastRawMessage.Acknowledge();
                     }
                 }
             }
