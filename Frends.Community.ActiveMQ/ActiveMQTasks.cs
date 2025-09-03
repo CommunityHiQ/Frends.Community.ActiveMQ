@@ -22,11 +22,16 @@ namespace Frends.Community.ActiveMQ
         public static async Task<Result> Consume([PropertyTab] Input input, [PropertyTab] Options options, CancellationToken cancellationToken)
         {
             var messages = new List<Message>();
+            IMessage lastRawMessage = null;
+
             var factory = new NMSConnectionFactory(input.ConnectionString);
             using (var connection = await factory.CreateConnectionAsync())
             {
                 connection.Start();
-                using (var session = await connection.CreateSessionAsync(AcknowledgementMode.AutoAcknowledge))
+                using (var session = await connection.CreateSessionAsync(
+                           options.Acknowledge == AcknowledgeBehavior.Immediate
+                               ? AcknowledgementMode.AutoAcknowledge
+                               : AcknowledgementMode.ClientAcknowledge))
                 using (var queue = await session.GetQueueAsync(input.Queue))
                 using (var consumer = await session.CreateConsumerAsync(queue))
                 {
@@ -39,41 +44,53 @@ namespace Frends.Community.ActiveMQ
                         var task = Task.Run(() => consumer.Receive(TimeSpan.FromSeconds(options.MessageReceiveTimeout)), cancellationToken);
                         if (task.Wait(options.TaskExecutionTimeout == 0 ? 5000 : options.TaskExecutionTimeout, cancellationToken))
                         {
-                            if (task.Result is ITextMessage textMessage)
+                            var rawMsg = task.Result;
+                            if (rawMsg == null) break;
+
+                            if (rawMsg is ITextMessage textMessage)
                             {
                                 messages.Add(new Message("Text", textMessage.Text));
                                 readNextMessage = true;
                             }
-                            else if (task.Result is IStreamMessage streamMessage)
+                            else if (rawMsg is IStreamMessage)
                             {
                                 messages.Add(new Message("Stream", "Stream message are not supported"));
                                 readNextMessage = true;
                             }
-                            else if (task.Result is IBytesMessage bytesMessage)
+                            else if (rawMsg is IBytesMessage bytesMessage)
                             {
                                 messages.Add(new Message("Bytes", bytesMessage.Content));
                                 readNextMessage = true;
                             }
-                            else if (task.Result is IMapMessage mapMessage)
+                            else if (rawMsg is IMapMessage)
                             {
                                 messages.Add(new Message("Map", "Map messages are not supported"));
                                 readNextMessage = true;
                             }
-                            else if (task.Result is IObjectMessage objectMessage)
+                            else if (rawMsg is IObjectMessage)
                             {
                                 messages.Add(new Message("Object", "Object messages are not supported"));
                                 readNextMessage = true;
                             }
-                            else if (task.Result is null)
-                                break;
                             else
-                                messages.Add(new Message("Unknown message type", "Unknown message type: " + task.Result.GetType().Name));
+                            {
+                                messages.Add(new Message("Unknown message type", "Unknown message type: " + rawMsg.GetType().Name));
+                                readNextMessage = true;
+                            }
+
+                            if (options.Acknowledge == AcknowledgeBehavior.OnSuccess)
+                                lastRawMessage = rawMsg;
 
                             if (options.MaxMessagesToConsume > 0 &&
                                 messages.Count >= options.MaxMessagesToConsume)
                                 break;
                         }
                     } while (readNextMessage);
+
+                    if (options.Acknowledge == AcknowledgeBehavior.OnSuccess && lastRawMessage != null)
+                    {
+                        lastRawMessage.Acknowledge();
+                    }
                 }
             }
             if (options.ThrowErrorIfEmpty && messages.Count == 0)
